@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>chatterbox</title>
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser.js"></script>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <!-- your scripts -->
+    <!-- <script src="env/config.js"></script> -->
+    <script src="scripts/app.js"></script>
+  </head>
+  <body>
+    <div id="main">
+      <h1>&#x263A; chatterbox</h1>
+      <span>Room:</span>
+      <select id='roomSelect' onChange="roomFunc(value);">
+        <option value='home'>Home</option>
+      </select>
+      <input type="text" id="newRoom"/>
+      <input type="button" id="addRoom" value="Create New Room"/>
+      <button class="mainRefresh">Refresh</button>
+    </div>
+<!--     <form id="enterMessage"> Chat: <input type="text" 
+    </form>
+    <button class="sendChat"> Send </button> -->
+    <form id="write-message" action="#" method="post">
+      <textarea id="comment" placeholder="What's happening?" maxlength="140"></textarea>
+      <input class="message-btn" type="submit" value="Post">
+    </form>
+    <div id="chats"></div>
+
+  </body>
+  <script type="text/javascript"> 
+    app.init();
+  </script>
+</html>
