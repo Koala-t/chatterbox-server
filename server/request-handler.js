@@ -52,7 +52,23 @@ module.exports = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end('Hello, World!');
+
+  if (request.method === 'POST') {
+    request.on('data', function(message) { 
+      console.log('----------------->Received body data:');
+      console.log('----------------->', message.toString()); 
+    });
+    
+    request.on('end', function() {
+      // empty 200 OK response for now
+      response.writeHead(201, "OK", {'Content-Type': 'text/html'});
+      response.end();
+    });
+  }
+
+  if (request.method === 'GET') {
+    response.end(JSON.stringify({data: 'Hello, World!', results: []}));
+  }
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
