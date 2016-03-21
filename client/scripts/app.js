@@ -9,7 +9,16 @@ var app = {};
 app.server = 'http://127.0.0.1:3000/classes/messages';
 
 app.init = function() {
-  app.fetch();  
+  // app.fetch();
+  var message = {
+    username: 'Mel Brooks',
+    text: 'It\'s good to be the king',
+    roomname: 'lobby'
+  };
+
+  app.send(message);
+
+  app.fetch();
 };
 
 app.send = function(message) {
@@ -43,6 +52,7 @@ app.fetch = function() {
       //   app.addRoom('home');
       // }
       // var resultsArray = data.results;
+      debugger;
       for (var i = 0; i < data.results.length; i++) {
         var $newMessage = $('<div class="message"></div>');
         var $username = $('<div class="username"></div>');
