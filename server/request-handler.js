@@ -59,15 +59,6 @@ module.exports = function(request, response) {
   // node to actually send all the data over to the client.
 
   if (request.method === 'OPTIONS') {
-    console.log('!OPTIONS');
-    var headers = {};
-    // IE8 does not allow domains to be specified, just the *
-    // headers["Access-Control-Allow-Origin"] = req.headers.origin;
-    headers["Access-Control-Allow-Origin"] = "*";
-    headers["Access-Control-Allow-Methods"] = "POST, GET, PUT, DELETE, OPTIONS";
-    headers["Access-Control-Allow-Credentials"] = false;
-    headers["Access-Control-Max-Age"] = '86400'; // 24 hours
-    headers["Access-Control-Allow-Headers"] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept";
     response.writeHead(200, headers);
     response.end();
   }
@@ -78,13 +69,14 @@ module.exports = function(request, response) {
     });
     
     request.on('end', function() {
-      response.writeHead(201, 'OK', {'Content-Type': 'text/html'});
+      response.writeHead(201, headers);
       response.end();
     });
 
   }
   
   if (request.method === 'GET') {
+    response.writeHead(statusCode, headers);
     response.end(JSON.stringify({data: 'Hello, World!', results: result}));
   }
 
@@ -103,6 +95,7 @@ var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'access-control-allow-headers': 'content-type, accept',
-  'access-control-max-age': 10 // Seconds.
+  'access-control-max-age': 10, // Seconds.
+  'Content-Type': 'application/json'
 };
 
