@@ -11,6 +11,7 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+var result = [];
 
 module.exports = function(request, response) {
   // Request and Response come from node's http module.
@@ -31,6 +32,7 @@ module.exports = function(request, response) {
 
   // The outgoing status.
   var statusCode = 200;
+  
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
@@ -55,8 +57,11 @@ module.exports = function(request, response) {
 
   if (request.method === 'POST') {
     request.on('data', function(message) { 
-      console.log('----------------->Received body data:');
+      console.log('-----------------> Received body data:');
       console.log('----------------->', message.toString()); 
+      result.push(JSON.parse(message));
+      console.log('----------------->', result);
+      // console.log('-------result[0]---------->', result[0]);
     });
     
     request.on('end', function() {
@@ -65,9 +70,9 @@ module.exports = function(request, response) {
       response.end();
     });
   }
-
   if (request.method === 'GET') {
-    response.end(JSON.stringify({data: 'Hello, World!', results: []}));
+    console.log('-----------result[0)---------->', result[0], typeof result[0]);
+    response.end(JSON.stringify({data: 'Hello, World!', results: result}));
   }
 };
 
