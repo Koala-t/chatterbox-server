@@ -2,6 +2,7 @@
 
 var select;
 var friends = {};
+var chatRooms = {};
 
 var app = {};
 
@@ -9,16 +10,7 @@ var app = {};
 app.server = 'http://127.0.0.1:3000/classes/messages';
 
 app.init = function() {
-  // app.fetch();
-  var message = {
-    username: 'Mel Brooks',
-    text: 'It\'s good to be the king',
-    roomname: 'lobby'
-  };
-
-  app.send(message);
-
-  // app.fetch();
+  app.fetch();
 };
 
 app.send = function(message) {
@@ -31,6 +23,7 @@ app.send = function(message) {
     contentType: 'application/json',
     success: function (data) {
       console.log('chatterbox: Message sent');
+      console.log(data);
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -47,12 +40,11 @@ app.fetch = function() {
     success: function (data) {
       // console.log(data);
       app.clearMessages();
-      app.clearOptions();
+      // app.clearOptions();
+      var data = JSON.parse(data);
       // if (select !== 'home') {
       //   app.addRoom('home');
       // }
-      // var resultsArray = data.results;
-      // debugger;
       for (var i = 0; i < data.results.length; i++) {
         var $newMessage = $('<div class="message"></div>');
         var $username = $('<div class="username"></div>');
@@ -75,8 +67,9 @@ app.fetch = function() {
       var rooms = _.uniq(_.pluck(data.results, 'roomname'));
 
       for (var i = 0; i < rooms.length; i++) {
-        if (rooms[i]) {
+        if (!chatRooms.hasOwnProperty(rooms[i])) {
           app.addRoom(rooms[i]);
+          chatRooms[rooms[i]] = rooms[i];
         }
       }
     },
@@ -95,27 +88,27 @@ app.clearOptions = function() {
   $('#roomSelect').empty();
 };
 
-app.userAddMessage = function() {
-  // var currentUser = window.location.s
-  app.addMessage(message);
-};
+// app.userAddMessage = function() {
+//   // var currentUser = window.location.s
+//   app.addMessage(message);
+// };
 
-app.addMessage = function(message) {
-  this.send(message);
-  //maybe instead of the line below, we will fetch
-  var $newMessage = $('<div class="message"></div>');
+// app.addMessage = function(message) {
+//   this.send(message);
+//   //maybe instead of the line below, we will fetch
+//   var $newMessage = $('<div class="message"></div>');
 
-  var $username = $('<div class="username"></div>');
-  var $text = $('<div class="text"></div>');
-  var $roomname = $('<div class="roomname"></div>');
-  $username.text(message.username);
-  $text.text(message.text);
-  $roomname.text(message.roomname);
-  $username.appendTo($newMessage);
-  $text.appendTo($newMessage);
-  $roomname.appendTo($newMessage);
-  $('#chats').append($newMessage);
-};
+//   var $username = $('<div class="username"></div>');
+//   var $text = $('<div class="text"></div>');
+//   var $roomname = $('<div class="roomname"></div>');
+//   $username.text(message.username);
+//   $text.text(message.text);
+//   $roomname.text(message.roomname);
+//   $username.appendTo($newMessage);
+//   $text.appendTo($newMessage);
+//   $roomname.appendTo($newMessage);
+//   $('#chats').append($newMessage);
+// };
 
 var processRoomName = function(name) {
   return name;
@@ -160,7 +153,8 @@ $(document).submit('write-message', function(event) {
     text: text,
     roomname: select || 'lobby'
   };
-  app.addMessage(message);
+  // app.addMessage(message);
+  app.send(message);
   $('.mainRefresh').trigger('click');
   event.preventDefault();
 });
@@ -178,7 +172,8 @@ var roomFunc = function(value) {
     url: 'http://127.0.0.1:3000/classes/messages',
     type: 'GET',
     success: function (data) {
-      // var resultsArray = data.results;
+      
+      var data = JSON.parse(data);
 
       for (var i = 0; i < data.results.length; i++) {
         if (data.results[i].roomname) {
@@ -215,4 +210,6 @@ var roomFunc = function(value) {
     }
   });
 };
+
+setInterval(app.fetch, 500);
 

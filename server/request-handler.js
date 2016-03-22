@@ -65,7 +65,7 @@ module.exports = function(request, response) {
 
   if (request.method === 'POST') {
     request.on('data', function(message) {             
-      result.push(JSON.parse(message));
+      result.unshift(JSON.parse(message));
     });
     
     request.on('end', function() {
