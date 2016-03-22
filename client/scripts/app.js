@@ -1,5 +1,3 @@
-//ATTENTION FUTURE CHRIS N KEVIN: APOSTROPHES ARE NOT WORKING IN ROOM NAMES
-
 var select;
 var friends = {};
 var chatRooms = {};
@@ -38,13 +36,11 @@ app.fetch = function() {
     url: 'http://127.0.0.1:3000/classes/messages',
     type: 'GET',
     success: function (data) {
-      // console.log(data);
+      
       app.clearMessages();
       // app.clearOptions();
       var data = JSON.parse(data);
-      // if (select !== 'home') {
-      //   app.addRoom('home');
-      // }
+
       for (var i = 0; i < data.results.length; i++) {
         var $newMessage = $('<div class="message"></div>');
         var $username = $('<div class="username"></div>');
@@ -59,7 +55,7 @@ app.fetch = function() {
           $username.text(data.results[i].username).appendTo($newMessage);
         }
         $text.text(data.results[i].text).appendTo($newMessage);
-        $roomname.text(data.results[i].roomname).appendTo($newMessage);
+        $roomname.text(data.results[i].roomname + ' @ ' + data.results[i].date).appendTo($newMessage);
 
         $('#chats').append($newMessage);
       }
@@ -88,28 +84,6 @@ app.clearOptions = function() {
   $('#roomSelect').empty();
 };
 
-// app.userAddMessage = function() {
-//   // var currentUser = window.location.s
-//   app.addMessage(message);
-// };
-
-// app.addMessage = function(message) {
-//   this.send(message);
-//   //maybe instead of the line below, we will fetch
-//   var $newMessage = $('<div class="message"></div>');
-
-//   var $username = $('<div class="username"></div>');
-//   var $text = $('<div class="text"></div>');
-//   var $roomname = $('<div class="roomname"></div>');
-//   $username.text(message.username);
-//   $text.text(message.text);
-//   $roomname.text(message.roomname);
-//   $username.appendTo($newMessage);
-//   $text.appendTo($newMessage);
-//   $roomname.appendTo($newMessage);
-//   $('#chats').append($newMessage);
-// };
-
 var processRoomName = function(name) {
   return name;
 };
@@ -118,11 +92,17 @@ app.addRoom = function(name) {
   // debugger;
   var roomName = processRoomName(name);
   $('#roomSelect').append('<option value="' + roomName + '">' + name + '</option>');
+  
 };
 
 // CREATE A NEW ROOM
 $(document).on('click', '#addRoom', function() {
-  $('#roomSelect').append('<option value="' + $('#newRoom').val() + '">' + $('#newRoom').val() + '</option>');
+  var room = $('#newRoom').val();
+
+  if (!chatRooms.hasOwnProperty(room)) {
+    $('#roomSelect').append('<option value="' + room + '">' + room + '</option>');
+    chatRooms[room] = room;
+  }
 });
 
 app.addFriend = function(value) {
@@ -151,7 +131,8 @@ $(document).submit('write-message', function(event) {
   var message = {
     username: window.location.search.slice(10).split('%20').join(' '),
     text: text,
-    roomname: select || 'lobby'
+    roomname: select || 'lobby',
+    date: new Date( new Date().getTime() + (-7) * 3600 * 1000).toUTCString().replace( / GMT$/, '' )
   };
   // app.addMessage(message);
   app.send(message);
@@ -165,51 +146,59 @@ app.showRoom = function(room) {
 
 var roomFunc = function(value) {
   select = value;
-  app.clearMessages();
 
-  $.ajax({
-    // TODO  Change this to point to our node server
-    url: 'http://127.0.0.1:3000/classes/messages',
-    type: 'GET',
-    success: function (data) {
-      
-      var data = JSON.parse(data);
+  if (select === undefined) {
+    app.fetch();
+  } else {
 
-      for (var i = 0; i < data.results.length; i++) {
-        if (data.results[i].roomname) {
-          if (processRoomName(data.results[i].roomname) === value) {
-            var $newMessage = $('<div class="message"></div>');
+    $.ajax({
+      // TODO  Change this to point to our node server
+      url: 'http://127.0.0.1:3000/classes/messages',
+      type: 'GET',
+      success: function (data) {
 
-            var $username = $('<div class="username"></div>');
-            var $text = $('<div class="text"></div>');
-            var $roomname = $('<div class="roomname"></div>');
+        app.clearMessages();
+        var data = JSON.parse(data);
 
-            if (_.contains(friends, data.results[i].username)) {
-              var newFriend = $username.text(data.results[i].username + ' :)');
-              newFriend[0].className += ' friend';
-              // console.log(newFriend[0].className);
-              newFriend.appendTo($newMessage);
-            } else {
-              $username.text(data.results[i].username).appendTo($newMessage);
-            }
+        for (var i = 0; i < data.results.length; i++) {
+          if (data.results[i].roomname) {
+            if (data.results[i].roomname === value) {
+              
+              var $newMessage = $('<div class="message"></div>');
 
-            // $username.text(data.results[i].username);
-            $text.text(data.results[i].text);
-            $roomname.text(data.results[i].roomname);
-            $username.appendTo($newMessage);
-            $text.appendTo($newMessage);
-            $roomname.appendTo($newMessage);
-            $('#chats').append($newMessage);
-          }          
+              var $username = $('<div class="username"></div>');
+              var $text = $('<div class="text"></div>');
+              var $roomname = $('<div class="roomname"></div>');
+
+              if (_.contains(friends, data.results[i].username)) {
+                var newFriend = $username.text(data.results[i].username + ' :)');
+                newFriend[0].className += ' friend';
+                // console.log(newFriend[0].className);
+                newFriend.appendTo($newMessage);
+              } else {
+                $username.text(data.results[i].username).appendTo($newMessage);
+              }
+
+              // $username.text(data.results[i].username);
+              $text.text(data.results[i].text);
+              $roomname.text(data.results[i].roomname);
+              $username.appendTo($newMessage);
+              $text.appendTo($newMessage);
+              $roomname.appendTo($newMessage);
+              $('#chats').append($newMessage);
+            }          
+          }
         }
+      },
+      error: function (data) {
+        // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+        console.error('chatterbox: Failed to retrieve message', data);
       }
-    },
-    error: function (data) {
-      // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-      console.error('chatterbox: Failed to retrieve message', data);
-    }
-  });
+    });
+  }
 };
 
-setInterval(app.fetch, 500);
+setInterval(function() {
+  roomFunc(select);
+}, 500);
 
