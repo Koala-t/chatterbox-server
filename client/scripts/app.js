@@ -18,14 +18,14 @@ app.init = function() {
 
   app.send(message);
 
-  app.fetch();
+  // app.fetch();
 };
 
 app.send = function(message) {
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
     // TODO  Change this to point to our node server
-    url: 'http://127.0.0.1:3000/classes/room',
+    url: 'http://127.0.0.1:3000/classes/messages',
     type: 'POST',
     data: JSON.stringify(message),
     contentType: 'application/json',
@@ -52,7 +52,7 @@ app.fetch = function() {
       //   app.addRoom('home');
       // }
       // var resultsArray = data.results;
-      debugger;
+      // debugger;
       for (var i = 0; i < data.results.length; i++) {
         var $newMessage = $('<div class="message"></div>');
         var $username = $('<div class="username"></div>');
