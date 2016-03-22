@@ -33,6 +33,9 @@ module.exports = function(request, response) {
   // The outgoing status.
   var statusCode = 200;
   
+  if (request.url !== '/classes/messages') {
+    statusCode = 404;
+  }
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
@@ -56,24 +59,21 @@ module.exports = function(request, response) {
   // node to actually send all the data over to the client.
 
   if (request.method === 'POST') {
-    request.on('data', function(message) { 
-      console.log('-----------------> Received body data:');
-      console.log('----------------->', message.toString()); 
+    request.on('data', function(message) {             
       result.push(JSON.parse(message));
-      console.log('----------------->', result);
-      // console.log('-------result[0]---------->', result[0]);
     });
     
     request.on('end', function() {
-      // empty 200 OK response for now
-      response.writeHead(201, "OK", {'Content-Type': 'text/html'});
+      response.writeHead(201, 'OK', {'Content-Type': 'text/html'});
       response.end();
     });
+
   }
+  
   if (request.method === 'GET') {
-    console.log('-----------result[0)---------->', result[0], typeof result[0]);
     response.end(JSON.stringify({data: 'Hello, World!', results: result}));
   }
+
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
